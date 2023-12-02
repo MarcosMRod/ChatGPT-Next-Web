@@ -1,30 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import { Path, SlotID } from "../constant";
-import { IconButton } from "./button";
-import { EmojiAvatar } from "./emoji";
-import styles from "./new-chat.module.scss";
-
-import LeftIcon from "../icons/left.svg";
-import LightningIcon from "../icons/lightning.svg";
-import EyeIcon from "../icons/eye.svg";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { Mask, useMaskStore } from "../store/mask";
-import Locale from "../locales";
-import { useAppConfig, useChatStore } from "../store";
-import { MaskAvatar } from "./mask";
+
 import { useCommand } from "../command";
-import { showConfirm } from "./ui-lib";
+import { Path, SlotID } from "../constant";
+import EyeIcon from "../icons/eye.svg";
+import LeftIcon from "../icons/left.svg";
+import LightningIcon from "../icons/lightning.svg";
+import Locale from "../locales";
 import { BUILTIN_MASK_STORE } from "../masks";
+import { useAppConfig, useChatStore } from "../store";
+import { Mask, useMaskStore } from "../store/mask";
+import { IconButton } from "./button";
+import { EmojiAvatar } from "./emoji";
+import { MaskAvatar } from "./mask";
+import { showConfirm } from "./ui-lib";
 
 function MaskItem(props: { mask: Mask; onClick?: () => void }) {
   return (
-    <div className={styles["mask"]} onClick={props.onClick}>
+    <div onClick={props.onClick}>
       <MaskAvatar
         avatar={props.mask.avatar}
         model={props.mask.modelConfig.model}
       />
-      <div className={styles["mask-name"] + " one-line"}>{props.mask.name}</div>
+      <div>{props.mask.name}</div>
     </div>
   );
 }
@@ -111,8 +110,8 @@ export function NewChat() {
   }, [groups]);
 
   return (
-    <div className={styles["new-chat"]}>
-      <div className={styles["mask-header"]}>
+    <div>
+      <div>
         <IconButton
           icon={<LeftIcon />}
           text={Locale.NewChat.Return}
@@ -132,22 +131,22 @@ export function NewChat() {
           ></IconButton>
         )}
       </div>
-      <div className={styles["mask-cards"]}>
-        <div className={styles["mask-card"]}>
+      <div>
+        <div>
           <EmojiAvatar avatar="1f606" size={24} />
         </div>
-        <div className={styles["mask-card"]}>
+        <div>
           <EmojiAvatar avatar="1f916" size={24} />
         </div>
-        <div className={styles["mask-card"]}>
+        <div>
           <EmojiAvatar avatar="1f479" size={24} />
         </div>
       </div>
 
-      <div className={styles["title"]}>{Locale.NewChat.Title}</div>
-      <div className={styles["sub-title"]}>{Locale.NewChat.SubTitle}</div>
+      <div>{Locale.NewChat.Title}</div>
+      <div>{Locale.NewChat.SubTitle}</div>
 
-      <div className={styles["actions"]}>
+      <div>
         <IconButton
           text={Locale.NewChat.More}
           onClick={() => navigate(Path.Masks)}
@@ -162,13 +161,12 @@ export function NewChat() {
           icon={<LightningIcon />}
           type="primary"
           shadow
-          className={styles["skip"]}
         />
       </div>
 
-      <div className={styles["masks"]} ref={maskRef}>
+      <div ref={maskRef}>
         {groups.map((masks, i) => (
-          <div key={i} className={styles["mask-row"]}>
+          <div key={i}>
             {masks.map((mask, index) => (
               <MaskItem
                 key={index}

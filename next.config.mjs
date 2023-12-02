@@ -23,6 +23,10 @@ const nextConfig = {
     config.resolve.fallback = {
       child_process: false,
     };
+    config.experiments = {
+      asyncWebAssembly: true,
+      layers: true,
+    };
 
     return config;
   },

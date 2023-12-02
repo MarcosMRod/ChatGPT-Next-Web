@@ -1,5 +1,4 @@
 import * as React from "react";
-import styles from "./input-range.module.scss";
 
 interface InputRangeProps {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -21,7 +20,7 @@ export function InputRange({
   step,
 }: InputRangeProps) {
   return (
-    <div className={styles["input-range"] + ` ${className ?? ""}`}>
+    <div>
       {title || value}
       <input
         type="range"

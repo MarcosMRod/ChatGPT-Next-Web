@@ -1,19 +1,27 @@
-import { IconButton } from "./button";
-import { ErrorBoundary } from "./error";
+import { useState } from "react";
 
-import styles from "./mask.module.scss";
+import { useNavigate } from "react-router-dom";
 
-import DownloadIcon from "../icons/download.svg";
-import UploadIcon from "../icons/upload.svg";
-import EditIcon from "../icons/edit.svg";
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  OnDragEndResponder,
+} from "@hello-pangea/dnd";
+
+import { ROLES } from "../client/api";
+import { FileName, Path } from "../constant";
 import AddIcon from "../icons/add.svg";
 import CloseIcon from "../icons/close.svg";
-import DeleteIcon from "../icons/delete.svg";
-import EyeIcon from "../icons/eye.svg";
 import CopyIcon from "../icons/copy.svg";
+import DeleteIcon from "../icons/delete.svg";
+import DownloadIcon from "../icons/download.svg";
 import DragIcon from "../icons/drag.svg";
-
-import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
+import EditIcon from "../icons/edit.svg";
+import EyeIcon from "../icons/eye.svg";
+import UploadIcon from "../icons/upload.svg";
+import Locale, { ALL_LANG_OPTIONS, AllLangs, Lang } from "../locales";
+import { BUILTIN_MASK_STORE } from "../masks";
 import {
   ChatMessage,
   createMessage,
@@ -22,7 +30,13 @@ import {
   useAppConfig,
   useChatStore,
 } from "../store";
-import { ROLES } from "../client/api";
+import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
+import { Updater } from "../typing";
+import { copyToClipboard, downloadAs, readFromFile } from "../utils";
+import { IconButton } from "./button";
+import { Avatar, AvatarPicker } from "./emoji";
+import { ErrorBoundary } from "./error";
+import { ModelConfigList } from "./model-config";
 import {
   Input,
   List,
@@ -32,24 +46,6 @@ import {
   Select,
   showConfirm,
 } from "./ui-lib";
-import { Avatar, AvatarPicker } from "./emoji";
-import Locale, { AllLangs, ALL_LANG_OPTIONS, Lang } from "../locales";
-import { useNavigate } from "react-router-dom";
-
-import chatStyle from "./chat.module.scss";
-import { useEffect, useState } from "react";
-import { copyToClipboard, downloadAs, readFromFile } from "../utils";
-import { Updater } from "../typing";
-import { ModelConfigList } from "./model-config";
-import { FileName, Path } from "../constant";
-import { BUILTIN_MASK_STORE } from "../masks";
-import { nanoid } from "nanoid";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  OnDragEndResponder,
-} from "@hello-pangea/dnd";
 
 // drag and drop helper function
 function reorder<T>(list: T[], startIndex: number, endIndex: number): T[] {
@@ -219,15 +215,15 @@ function ContextPromptItem(props: {
   const [focusingInput, setFocusingInput] = useState(false);
 
   return (
-    <div className={chatStyle["context-prompt-row"]}>
+    <div>
       {!focusingInput && (
         <>
-          <div className={chatStyle["context-drag"]}>
+          <div>
             <DragIcon />
           </div>
           <Select
             value={props.prompt.role}
-            className={chatStyle["context-role"]}
+            className="bg-zinc-700 rounded-lg p-1"
             onChange={(e) =>
               props.update({
                 ...props.prompt,
@@ -246,7 +242,7 @@ function ContextPromptItem(props: {
       <Input
         value={props.prompt.content}
         type="text"
-        className={chatStyle["context-content"]}
+        className="bg-zinc-700 rounded-lg p-1"
         rows={focusingInput ? 5 : 1}
         onFocus={() => setFocusingInput(true)}
         onBlur={() => {
@@ -265,7 +261,6 @@ function ContextPromptItem(props: {
       {!focusingInput && (
         <IconButton
           icon={<DeleteIcon />}
-          className={chatStyle["context-delete-button"]}
           onClick={() => props.remove()}
           bordered
         />
@@ -308,7 +303,7 @@ export function ContextPrompts(props: {
 
   return (
     <>
-      <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 20 }}>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="context-prompt-list">
             {(provided) => (
@@ -332,7 +327,6 @@ export function ContextPrompts(props: {
                           remove={() => removeContextPrompt(i)}
                         />
                         <div
-                          className={chatStyle["context-prompt-insert"]}
                           onClick={() => {
                             addContextPrompt(
                               createMessage({
@@ -357,12 +351,11 @@ export function ContextPrompts(props: {
         </DragDropContext>
 
         {props.context.length === 0 && (
-          <div className={chatStyle["context-prompt-row"]}>
+          <div>
             <IconButton
               icon={<AddIcon />}
               text={Locale.Context.Add}
               bordered
-              className={chatStyle["context-prompt-button"]}
               onClick={() =>
                 addContextPrompt(
                   createMessage({
@@ -441,7 +434,7 @@ export function MaskPage() {
 
   return (
     <ErrorBoundary>
-      <div className={styles["mask-page"]}>
+      <div>
         <div className="window-header">
           <div className="window-header-title">
             <div className="window-header-main-title">
@@ -479,17 +472,15 @@ export function MaskPage() {
           </div>
         </div>
 
-        <div className={styles["mask-page-body"]}>
-          <div className={styles["mask-filter"]}>
+        <div>
+          <div>
             <input
               type="text"
-              className={styles["search-bar"]}
               placeholder={Locale.Mask.Page.Search}
               autoFocus
               onInput={(e) => onSearch(e.currentTarget.value)}
             />
             <Select
-              className={styles["mask-filter-lang"]}
               value={filterLang ?? Locale.Settings.Lang.All}
               onChange={(e) => {
                 const value = e.currentTarget.value;
@@ -511,7 +502,6 @@ export function MaskPage() {
             </Select>
 
             <IconButton
-              className={styles["mask-create"]}
               icon={<AddIcon />}
               text={Locale.Mask.Page.Create}
               bordered
@@ -524,21 +514,21 @@ export function MaskPage() {
 
           <div>
             {masks.map((m) => (
-              <div className={styles["mask-item"]} key={m.id}>
-                <div className={styles["mask-header"]}>
-                  <div className={styles["mask-icon"]}>
+              <div key={m.id}>
+                <div>
+                  <div>
                     <MaskAvatar avatar={m.avatar} model={m.modelConfig.model} />
                   </div>
-                  <div className={styles["mask-title"]}>
-                    <div className={styles["mask-name"]}>{m.name}</div>
-                    <div className={styles["mask-info"] + " one-line"}>
+                  <div>
+                    <div>{m.name}</div>
+                    <div>
                       {`${Locale.Mask.Item.Info(m.context.length)} / ${
                         ALL_LANG_OPTIONS[m.lang]
                       } / ${m.modelConfig.model}`}
                     </div>
                   </div>
                 </div>
-                <div className={styles["mask-actions"]}>
+                <div>
                   <IconButton
                     icon={<AddIcon />}
                     text={Locale.Mask.Item.Chat}
@@ -579,7 +569,7 @@ export function MaskPage() {
       </div>
 
       {editingMask && (
-        <div className="modal-mask">
+        <div className="modal-mask bg-black/90 absolute top-0 left-0 h-screen w-full flex items-center justify-center">
           <Modal
             title={Locale.Mask.EditModal.Title(editingMask?.builtin)}
             onClose={closeMaskModal}

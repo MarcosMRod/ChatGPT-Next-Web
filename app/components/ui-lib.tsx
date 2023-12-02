@@ -1,19 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-import styles from "./ui-lib.module.scss";
-import LoadingIcon from "../icons/three-dots.svg";
-import CloseIcon from "../icons/close.svg";
-import EyeIcon from "../icons/eye.svg";
-import EyeOffIcon from "../icons/eye-off.svg";
-import DownIcon from "../icons/down.svg";
-import ConfirmIcon from "../icons/confirm.svg";
-import CancelIcon from "../icons/cancel.svg";
-import MaxIcon from "../icons/max.svg";
-import MinIcon from "../icons/min.svg";
 
-import Locale from "../locales";
-
-import { createRoot } from "react-dom/client";
 import React, { HTMLProps, useEffect, useState } from "react";
+
+import { MaximizeIcon, MinimizeIcon, XIcon } from "lucide-react";
+import { createRoot } from "react-dom/client";
+
+import CancelIcon from "../icons/cancel.svg";
+import ConfirmIcon from "../icons/confirm.svg";
+import DownIcon from "../icons/down.svg";
+import EyeOffIcon from "../icons/eye-off.svg";
+import EyeIcon from "../icons/eye.svg";
+import LoadingIcon from "../icons/three-dots.svg";
+import Locale from "../locales";
 import { IconButton } from "./button";
 
 export function Popover(props: {
@@ -23,11 +21,11 @@ export function Popover(props: {
   onClose?: () => void;
 }) {
   return (
-    <div className={styles.popover}>
+    <div>
       {props.children}
       {props.open && (
-        <div className={styles["popover-content"]}>
-          <div className={styles["popover-mask"]} onClick={props.onClose}></div>
+        <div>
+          <div onClick={props.onClose}></div>
           {props.content}
         </div>
       )}
@@ -36,9 +34,7 @@ export function Popover(props: {
 }
 
 export function Card(props: { children: JSX.Element[]; className?: string }) {
-  return (
-    <div className={styles.card + " " + props.className}>{props.children}</div>
-  );
+  return <div>{props.children}</div>;
 }
 
 export function ListItem(props: {
@@ -50,19 +46,12 @@ export function ListItem(props: {
   onClick?: () => void;
 }) {
   return (
-    <div
-      className={styles["list-item"] + ` ${props.className || ""}`}
-      onClick={props.onClick}
-    >
-      <div className={styles["list-header"]}>
-        {props.icon && <div className={styles["list-icon"]}>{props.icon}</div>}
-        <div className={styles["list-item-title"]}>
+    <div onClick={props.onClick}>
+      <div>
+        {props.icon && <div>{props.icon}</div>}
+        <div>
           <div>{props.title}</div>
-          {props.subTitle && (
-            <div className={styles["list-item-sub-title"]}>
-              {props.subTitle}
-            </div>
-          )}
+          {props.subTitle && <div>{props.subTitle}</div>}
         </div>
       </div>
       {props.children}
@@ -70,9 +59,13 @@ export function ListItem(props: {
   );
 }
 
-export function List(props: { children: React.ReactNode; id?: string }) {
+export function List(props: {
+  children: React.ReactNode;
+  id?: string;
+  className?: string;
+}) {
   return (
-    <div className={styles.list} id={props.id}>
+    <div id={props.id} className={props.className}>
       {props.children}
     </div>
   );
@@ -101,6 +94,7 @@ interface ModalProps {
   defaultMax?: boolean;
   footer?: React.ReactNode;
   onClose?: () => void;
+  className?: string;
 }
 export function Modal(props: ModalProps) {
   useEffect(() => {
@@ -121,40 +115,34 @@ export function Modal(props: ModalProps) {
   const [isMax, setMax] = useState(!!props.defaultMax);
 
   return (
-    <div
-      className={
-        styles["modal-container"] + ` ${isMax && styles["modal-container-max"]}`
-      }
-    >
-      <div className={styles["modal-header"]}>
-        <div className={styles["modal-title"]}>{props.title}</div>
+    <div className="flex flex-col items-center bg-zinc-600 rounded-xl py-2">
+      <div className={`flex-col flex  items-center p-4 w-full`}>
+        <div className="flex justify-between w-full py-2">
+          <h4 className="text-white">{props.title}</h4>
 
-        <div className={styles["modal-header-actions"]}>
-          <div
-            className={styles["modal-header-action"]}
-            onClick={() => setMax(!isMax)}
-          >
-            {isMax ? <MinIcon /> : <MaxIcon />}
+          <div className="flex gap-4">
+            <div onClick={() => setMax(!isMax)}>
+              {isMax ? (
+                <MinimizeIcon className="text-white" />
+              ) : (
+                <MaximizeIcon className="text-white" />
+              )}
+            </div>
+            <div onClick={props.onClose}>
+              <XIcon className="text-white" />
+            </div>
           </div>
-          <div
-            className={styles["modal-header-action"]}
-            onClick={props.onClose}
-          >
-            <CloseIcon />
-          </div>
+        </div>
+
+        <div className="flex flex-col overflow-y-scroll max-h-[500px] outline outline-white w-full p-8 rounded-xl">
+          {props.children}
         </div>
       </div>
 
-      <div className={styles["modal-content"]}>{props.children}</div>
-
-      <div className={styles["modal-footer"]}>
+      <div>
         {props.footer}
-        <div className={styles["modal-actions"]}>
-          {props.actions?.map((action, i) => (
-            <div key={i} className={styles["modal-action"]}>
-              {action}
-            </div>
-          ))}
+        <div className="flex justify-center gap-4">
+          {props.actions?.map((action, i) => <div key={i}>{action}</div>)}
         </div>
       </div>
     </div>
@@ -193,8 +181,8 @@ export type ToastProps = {
 
 export function Toast(props: ToastProps) {
   return (
-    <div className={styles["toast-container"]}>
-      <div className={styles["toast-content"]}>
+    <div>
+      <div>
         <span>{props.content}</span>
         {props.action && (
           <button
@@ -202,7 +190,6 @@ export function Toast(props: ToastProps) {
               props.action?.onClick?.();
               props.onClose?.();
             }}
-            className={styles["toast-action"]}
           >
             {props.action.text}
           </button>
@@ -218,13 +205,11 @@ export function showToast(
   delay = 3000,
 ) {
   const div = document.createElement("div");
-  div.className = styles.show;
+
   document.body.appendChild(div);
 
   const root = createRoot(div);
   const close = () => {
-    div.classList.add(styles.hide);
-
     setTimeout(() => {
       root.unmount();
       div.remove();
@@ -244,12 +229,7 @@ export type InputProps = React.HTMLProps<HTMLTextAreaElement> & {
 };
 
 export function Input(props: InputProps) {
-  return (
-    <textarea
-      {...props}
-      className={`${styles["input"]} ${props.className}`}
-    ></textarea>
-  );
+  return <textarea {...props}></textarea>;
 }
 
 export function PasswordInput(props: HTMLProps<HTMLInputElement>) {
@@ -283,11 +263,9 @@ export function Select(
 ) {
   const { className, children, ...otherProps } = props;
   return (
-    <div className={`${styles["select-with-icon"]} ${className}`}>
-      <select className={styles["select-with-icon-select"]} {...otherProps}>
-        {children}
-      </select>
-      <DownIcon className={styles["select-with-icon-icon"]} />
+    <div>
+      <select {...otherProps}>{children}</select>
+      <DownIcon />
     </div>
   );
 }
@@ -356,7 +334,6 @@ function PromptInput(props: {
 
   return (
     <textarea
-      className={styles["modal-input"]}
       autoFocus
       value={input}
       onInput={(e) => onInput(e.currentTarget.value)}
@@ -449,14 +426,13 @@ export function Selector<T>(props: {
   multiple?: boolean;
 }) {
   return (
-    <div className={styles["selector"]} onClick={() => props.onClose?.()}>
-      <div className={styles["selector-content"]}>
+    <div onClick={() => props.onClose?.()}>
+      <div>
         <List>
           {props.items.map((item, i) => {
             const selected = props.defaultSelectedValue === item.value;
             return (
               <ListItem
-                className={styles["selector-item"]}
                 key={i}
                 title={item.title}
                 subTitle={item.subTitle}

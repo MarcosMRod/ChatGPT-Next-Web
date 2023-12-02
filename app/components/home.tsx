@@ -1,38 +1,33 @@
 "use client";
 
-require("../polyfill");
-
-import { useState, useEffect } from "react";
-
-import styles from "./home.module.scss";
-
-import BotIcon from "../icons/bot.svg";
-import LoadingIcon from "../icons/three-dots.svg";
-
-import { getCSSVar, useMobileScreen } from "../utils";
+import { useEffect, useState } from "react";
 
 import dynamic from "next/dynamic";
-import { Path, SlotID } from "../constant";
-import { ErrorBoundary } from "./error";
-
-import { getISOLang, getLang } from "../locales";
-
 import {
   HashRouter as Router,
-  Routes,
   Route,
+  Routes,
   useLocation,
 } from "react-router-dom";
-import { SideBar } from "./sidebar";
-import { useAppConfig } from "../store/config";
-import { AuthPage } from "./auth";
-import { getClientConfig } from "../config/client";
+
 import { api } from "../client/api";
+import { getClientConfig } from "../config/client";
+import { Path } from "../constant";
+import BotIcon from "../icons/bot.svg";
+import LoadingIcon from "../icons/three-dots.svg";
+import { getISOLang } from "../locales";
 import { useAccessStore } from "../store";
+import { useAppConfig } from "../store/config";
+import { getCSSVar, useMobileScreen } from "../utils";
+import { AuthPage } from "./auth";
+import { ErrorBoundary } from "./error";
+import { SideBar } from "./sidebar";
+
+require("../polyfill");
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
-    <div className={styles["loading-content"] + " no-dark"}>
+    <div>
       {!props.noLogo && <BotIcon />}
       <LoadingIcon />
     </div>
@@ -128,30 +123,24 @@ function Screen() {
   const isHome = location.pathname === Path.Home;
   const isAuth = location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
-  const shouldTightBorder = getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
+  const shouldTightBorder =
+    getClientConfig()?.isApp || (config.tightBorder && !isMobileScreen);
 
   useEffect(() => {
     loadAsyncGoogleFont();
   }, []);
 
   return (
-    <div
-      className={
-        styles.container +
-        ` ${shouldTightBorder ? styles["tight-container"] : styles.container} ${
-          getLang() === "ar" ? styles["rtl-screen"] : ""
-        }`
-      }
-    >
+    <div className="flex">
       {isAuth ? (
         <>
           <AuthPage />
         </>
       ) : (
         <>
-          <SideBar className={isHome ? styles["sidebar-show"] : ""} />
+          <SideBar />
 
-          <div className={styles["window-content"]} id={SlotID.AppBody}>
+          <>
             <Routes>
               <Route path={Path.Home} element={<Chat />} />
               <Route path={Path.NewChat} element={<NewChat />} />
@@ -159,7 +148,7 @@ function Screen() {
               <Route path={Path.Chat} element={<Chat />} />
               <Route path={Path.Settings} element={<Settings />} />
             </Routes>
-          </div>
+          </>
         </>
       )}
     </div>

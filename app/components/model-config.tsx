@@ -1,9 +1,8 @@
-import { ModalConfigValidator, ModelConfig } from "../store";
-
 import Locale from "../locales";
+import { ModalConfigValidator, ModelConfig } from "../store";
+import { useAllModels } from "../utils/hooks";
 import { InputRange } from "./input-range";
 import { ListItem, Select } from "./ui-lib";
-import { useAllModels } from "../utils/hooks";
 
 export function ModelConfigList(props: {
   modelConfig: ModelConfig;
@@ -12,7 +11,7 @@ export function ModelConfigList(props: {
   const allModels = useAllModels();
 
   return (
-    <>
+    <div className="w-full">
       <ListItem title={Locale.Settings.Model}>
         <Select
           value={props.modelConfig.model}
@@ -211,6 +210,6 @@ export function ModelConfigList(props: {
           }
         ></input>
       </ListItem>
-    </>
+    </div>
   );
 }

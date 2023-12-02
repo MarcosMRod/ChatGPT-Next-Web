@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+
+import Locale from "../locales";
 import { ChatMessage, useAppConfig, useChatStore } from "../store";
 import { Updater } from "../typing";
 import { IconButton } from "./button";
 import { Avatar } from "./emoji";
 import { MaskAvatar } from "./mask";
-import Locale from "../locales";
-
-import styles from "./message-selector.module.scss";
 
 function useShiftRange() {
   const [startIndex, setStartIndex] = useState<number>();
@@ -141,12 +140,11 @@ export function MessageSelector(props: {
   const LATEST_COUNT = 4;
 
   return (
-    <div className={styles["message-selector"]}>
-      <div className={styles["message-filter"]}>
+    <div>
+      <div>
         <input
           type="text"
           placeholder={Locale.Select.Search}
-          className={styles["filter-item"] + " " + styles["search-bar"]}
           value={searchInput}
           onInput={(e) => {
             setSearchInput(e.currentTarget.value);
@@ -154,17 +152,11 @@ export function MessageSelector(props: {
           }}
         ></input>
 
-        <div className={styles["actions"]}>
-          <IconButton
-            text={Locale.Select.All}
-            bordered
-            className={styles["filter-item"]}
-            onClick={selectAll}
-          />
+        <div>
+          <IconButton text={Locale.Select.All} bordered onClick={selectAll} />
           <IconButton
             text={Locale.Select.Latest}
             bordered
-            className={styles["filter-item"]}
             onClick={() =>
               props.updateSelection((selection) => {
                 selection.clear();
@@ -177,7 +169,6 @@ export function MessageSelector(props: {
           <IconButton
             text={Locale.Select.Clear}
             bordered
-            className={styles["filter-item"]}
             onClick={() =>
               props.updateSelection((selection) => selection.clear())
             }
@@ -185,7 +176,7 @@ export function MessageSelector(props: {
         </div>
       </div>
 
-      <div className={styles["messages"]}>
+      <div>
         {messages.map((m, i) => {
           if (!isInSearchResult(m.id!)) return null;
           const id = m.id ?? i;
@@ -193,9 +184,6 @@ export function MessageSelector(props: {
 
           return (
             <div
-              className={`${styles["message"]} ${
-                props.selection.has(m.id!) && styles["message-selected"]
-              }`}
               key={i}
               onClick={() => {
                 props.updateSelection((selection) => {
@@ -204,7 +192,7 @@ export function MessageSelector(props: {
                 onClickIndex(i);
               }}
             >
-              <div className={styles["avatar"]}>
+              <div>
                 {m.role === "user" ? (
                   <Avatar avatar={config.avatar}></Avatar>
                 ) : (
@@ -214,16 +202,12 @@ export function MessageSelector(props: {
                   />
                 )}
               </div>
-              <div className={styles["body"]}>
-                <div className={styles["date"]}>
-                  {new Date(m.date).toLocaleString()}
-                </div>
-                <div className={`${styles["content"]} one-line`}>
-                  {m.content}
-                </div>
+              <div>
+                <div>{new Date(m.date).toLocaleString()}</div>
+                <div>{m.content}</div>
               </div>
 
-              <div className={styles["checkbox"]}>
+              <div>
                 <input type="checkbox" checked={isSelected}></input>
               </div>
             </div>
